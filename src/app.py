@@ -65,6 +65,9 @@ def http(
                                   envvar='log_level'),
     name: str = typer.Option("",
                              '--name'),
+    timeout_keep_alive: int = typer.Option(5,
+                                           "--timeout_keep_alive",
+                                           envvar="timeout_keep_alive")
 ):
     """启动 http 服务"""
     global NAME
@@ -72,16 +75,7 @@ def http(
     NAME = name
     logging.basicConfig(level=log_level)
     logging.info(f"http server listening on {host}:{port}")
-    uvicorn.run("app:app", host=host, port=port, debug=debug, reload=reload)
-
-
-# def fillcontent(size: int)->str:
-#     charset = '-ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-#     it = cycle(charset)
-#     content = [next(it) for _ in range(size)]
-#     if size > 0:
-#         content[0], content[-1] = '|', '|'
-#     return "".join(content)
+    uvicorn.run("app:app", host=host, port=port, debug=debug, reload=reload, timeout_keep_alive=timeout_keep_alive)
 
 
 def fillcontent(size: int):
@@ -198,7 +192,7 @@ async def echo():
             <ul id='messages'>
             </ul>
             <script>
-            
+
                 var ws = new WebSocket(window.location.href.replace("http", "ws"));
                 // var ws = new WebSocket("ws://localhost:8000/ws");
                 ws.onmessage = function(event) {
