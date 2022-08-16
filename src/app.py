@@ -170,9 +170,15 @@ async def bench():
 
 
 @app.get("/data")
-async def data(size: int = Query(..., gt=0), unit: UnitEnum = Query(...)):
-    size *= UNIT[unit.value]
-    return StreamingResponse(fillcontent(size))
+async def data(size: int = Query(..., gt=0), unit: UnitEnum = Query(None), attachment: bool = Query(False)):
+    if unit is not None:
+        size *= UNIT[unit.value]
+
+    headers = {}
+    if attachment:
+        headers = {"Content-Disposition": "Attachment"}
+
+    return StreamingResponse(fillcontent(size), headers=headers)
 
 
 @app.get('/echo')
